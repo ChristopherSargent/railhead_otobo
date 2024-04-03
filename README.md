@@ -138,8 +138,9 @@ OTOBO_DB_ROOT_PASSWORD=123456
 # The configured pathes must be absolute pathes that are available in the container.
 #OTOBO_NGINX_SSL_CERTIFICATE=/etc/nginx/ssl/ssl-cert.crt
 #OTOBO_NGINX_SSL_CERTIFICATE_KEY=/etc/nginx/ssl/ssl-key.key
-OTOBO_NGINX_SSL_CERTIFICATE=
-OTOBO_NGINX_SSL_CERTIFICATE_KEY=
+OTOBO_NGINX_SSL_CERTIFICATE=/etc/nginx/ssl/default.crt
+OTOBO_NGINX_SSL_CERTIFICATE_KEY=/etc/nginx/ssl/default.key
+
 
 # Elasticsearch options
 OTOBO_ELASTICSEARCH_ES_JAVA_OPTS=-Xms512m -Xmx512m
@@ -203,6 +204,7 @@ OTOBO_ELASTICSEARCH_ES_JAVA_OPTS=-Xms512m -Xmx512m
 #OTOBO_IMAGE_OTOBO_NGINX=rotheross/otobo-nginx-webproxy:rel-10_1_9
 #OTOBO_IMAGE_OTOBO_NGINX=rotheross/otobo-nginx-webproxy:devel-rel-10_1
 #OTOBO_IMAGE_OTOBO_NGINX=otobo-nginx-webproxy:local-10.1.x
+
 ```
 8. cd docker-compose/
 9. cp otobo-override-https.yml otobo-override-https.yml.ORIG
@@ -268,6 +270,8 @@ volumes:
 11. cd /root/otobo-docker
 12. docker compose up -d
 13. https://tickets01.cas.local/otobo/installer.pl
+* otobo  ESeHQbSphOFo1PV3 database
+* Start page: https://tickets01.cas.local/otobo/index.pl User:root@localhost Password:ocgQ35golc2SNggy
 
 # NOtes
 1. sed -i -e 's|otobo_nginx_ssl:/etc/nginx/ssl|./otobo_nginx_ssl:/etc/nginx/ssl|g' otobo-override-https.yml
