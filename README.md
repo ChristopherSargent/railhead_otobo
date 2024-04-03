@@ -16,12 +16,12 @@ This repository contains the code and configuration instructions to deploy Rothe
 * 10.1.2.189 dell01.cas.local
 
 # Install Docker
-* Note podman is in the default Ubuntu 22.04 repos but not Ubuntu 20.04
+* Note VM is running Ubuntu 20.04
 1. ssh cas@172.18.0.22
 2. sudo -i 
 3. curl -fsSL https://get.docker.com -o install-docker.sh && sudo sh install-docker.sh
 
-# Create certificate and key for ssl
+# Create Certificate and Key for SSL
 1. cd /root 
 2. mkdir -p /root/otobo-docker/docker-compose/otobo_nginx_ssl
 3. openssl req -newkey rsa:2048 -nodes -keyout /root/otobo-docker/docker-compose/otobo_nginx_ssl/default.key -x509 -days 365 -out /root/otobo-docker/docker-compose/otobo_nginx_ssl/default.crt
