@@ -15,30 +15,11 @@ This repository contains the code and configuration instructions to deploy Rothe
 * 172.18.0.22 tickets01.cas.local
 * 10.1.2.189 dell01.cas.local
 
-# Install Keycloak via [podman](https://docs.podman.io/en/stable/Introduction.html)
+# Install Docker
 * Note podman is in the default Ubuntu 22.04 repos but not Ubuntu 20.04
-1. ssh cas@10.1.2.86
+1. ssh cas@172.18.0.22
 2. sudo -i 
-3. apt install software-properties-common uidmap
-4. sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
-5. apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4D64390375060AA4
-```
-gpg:               imported: 1
-gpg: out of core handler ignored in FIPS mode
-
-```
-6. apt update 
-7. apt install podman -y 
-8. podman version
-```
-Version:      3.4.2
-API Version:  3.4.2
-Go Version:   go1.15.2
-Built:        Thu Jan  1 00:00:00 1970
-OS/Arch:      linux/amd64
-```
-9. apt install python3-pip -y 
-10. pip3 install podman-compose
+3. curl -fsSL https://get.docker.com -o install-docker.sh && sudo sh install-docker.sh
 
 # Create certificate and key for ssl
 1. cd /root 
@@ -62,10 +43,9 @@ State or Province Name (full name) [Some-State]:Virginia
 Locality Name (eg, city) []:Norfolk
 Organization Name (eg, company) [Internet Widgits Pty Ltd]:SWC
 Organizational Unit Name (eg, section) []:SWC
-Common Name (e.g. server FQDN or YOUR name) []:keycloak01.cas.local
+Common Name (e.g. server FQDN or YOUR name) []:tickets01.cas.local
 Email Address []:christopher.sargent@sargentwalker.io
 ```
-
 # Deploy Otobo 
 1. ssh cas@172.18.0.22
 2. sudo -i
@@ -271,48 +251,30 @@ volumes:
 12. docker compose up -d
 13. https://tickets01.cas.local/otobo/installer.pl
 * otobo  ESeHQbSphOFo1PV3 database
+
+![Screenshot](resources/otobo1.png)
+
+![Screenshot](resources/otobo2.png)
+
+![Screenshot](resources/otobo3.png)
+
+![Screenshot](resources/otobo4.png)
+
+![Screenshot](resources/otobo5.png)
+
+![Screenshot](resources/otobo6.png)
+
+![Screenshot](resources/otobo7.png)
+
+![Screenshot](resources/otobo8.png)
+
+14. https://tickets01.cas.local/otobo/index.pl
 * Start page: https://tickets01.cas.local/otobo/index.pl User:root@localhost Password:ocgQ35golc2SNggy
 
-# NOtes
-1. sed -i -e 's|otobo_nginx_ssl:/etc/nginx/ssl|./otobo_nginx_ssl:/etc/nginx/ssl|g' otobo-override-https.yml
-2. mkdir otobo_nginx_ssl
-3. openssl req -newkey rsa:2048 -nodes -keyout otobo_nginx_ssl/ssl-key.key -x509 -days 365 -out otobo_nginx_ssl/ssl-cert.crt
-4. openssl req -trustout -x509 -newkey rsa:4096 -sha256 -nodes -keyout privkey.pem -out fullchain.pem -days 3650
-5. openssl req -trustout -x509 -newkey rsa:4096 -sha256 -nodes -keyout otobo_nginx_ssl/ssl-key.key -out otobo_nginx_ssl/ssl-cert.crt -days 365
-6. openssl x509 -in otobo_nginx_ssl/ssl-cert.crt -trustout -out otobo_nginx_ssl/normal.pem
-7. cd otobo_nginx_ssl
-8. mv ssl-cert.crt ssl-cert.crt.ORIG
-9. cp normal.pem ssl-cert.crt
+![Screenshot](resources/otobo9.png)
 
-```
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-Country Name (2 letter code) [AU]:US
-State or Province Name (full name) [Some-State]:VA
-Locality Name (eg, city) []:Reston
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:SWC
-Organizational Unit Name (eg, section) []:SWC
-Common Name (e.g. server FQDN or YOUR name) []:tickets01.cas.local
-Email Address []:christopher.sargent@sargentwalker.io
-
-```
+![Screenshot](resources/otobo10.png)
 
 
-```
-https://tickets01.cas.local/otobo/installer.pl
-database
-7l3mzVYlafKw3E4c
-```
-```
-Start page:
-https://tickets01.cas.local/otobo/index.pl
-User:
-root@localhost
-Password:
-qXjt3Aip4B88fuWC
-```
+
+
