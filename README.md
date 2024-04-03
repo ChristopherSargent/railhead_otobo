@@ -13,7 +13,7 @@ This repository contains the code and configuration instructions to deploy Rothe
 
 # Test VMs
 * 172.18.0.22 tickets01.cas.local
-* 10.1.2.189 dell laptop
+* 10.1.2.189 dell01.cas.local
 
 # Install Keycloak via [podman](https://docs.podman.io/en/stable/Introduction.html)
 * Note podman is in the default Ubuntu 22.04 repos but not Ubuntu 20.04
@@ -42,8 +42,8 @@ OS/Arch:      linux/amd64
 
 # Create certificate and key for ssl
 1. cd /root 
-2. mkdir -p keycloak/certs
-3. openssl req -newkey rsa:2048 -nodes -keyout keycloak/certs/key.pem -x509 -days 365 -out keycloak/certs/certificate.pem
+2. mkdir -p /root/otobo-docker/docker-compose/otobo_nginx_ssl
+3. openssl req -newkey rsa:2048 -nodes -keyout /root/otobo-docker/docker-compose/otobo_nginx_ssl/default.key -x509 -days 365 -out /root/otobo-docker/docker-compose/otobo_nginx_ssl/default.crt
 ```
 Generating a RSA private key
 **********************************************************************************************************************************************************************************************************************************************************+++++
@@ -65,15 +65,17 @@ Organizational Unit Name (eg, section) []:SWC
 Common Name (e.g. server FQDN or YOUR name) []:keycloak01.cas.local
 Email Address []:christopher.sargent@sargentwalker.io
 ```
-4. chmod 644 keycloak/certs/*
 
-
-cd /root
-git clone https://github.com/RotherOSS/otobo-docker.git
-cd otobo-docker/
-cp .docker_compose_env_https .env
-vim .env 
-
+# Deploy Otobo 
+1. ssh cas@172.18.0.22
+2. sudo -i
+3. cd /root
+4. git clone https://github.com/RotherOSS/otobo-docker.git
+4. git clone git@github.com:ChristopherSargent/railhead_otobo.git
+5. cd otobo-docker/
+6. cp .docker_compose_env_https .env
+7. vim .env 
+```
 *
 From
 #OTOBO_NGINX_SSL_CERTIFICATE=/etc/nginx/ssl/ssl-cert.crt
@@ -83,10 +85,11 @@ OTOBO_NGINX_SSL_CERTIFICATE_KEY=
 
 To
 
-OTOBO_NGINX_SSL_CERTIFICATE=/etc/nginx/ssl/ssl-cert.crt
-OTOBO_NGINX_SSL_CERTIFICATE_KEY=/etc/nginx/ssl/ssl-key.key
-#OTOBO_NGINX_SSL_CERTIFICATE=
-#OTOBO_NGINX_SSL_CERTIFICATE_KEY=
+#OTOBO_NGINX_SSL_CERTIFICATE=/etc/nginx/ssl/ssl-cert.crt
+#OTOBO_NGINX_SSL_CERTIFICATE_KEY=/etc/nginx/ssl/ssl-key.key
+OTOBO_NGINX_SSL_CERTIFICATE=/etc/nginx/ssl/default.crt
+OTOBO_NGINX_SSL_CERTIFICATE_KEY=/etc/nginx/ssl/default.key
+```
 ```
 # This file contains default values for environment values that are needed either by Docker Compose itself
 # or by the docker compose files.
@@ -201,65 +204,9 @@ OTOBO_ELASTICSEARCH_ES_JAVA_OPTS=-Xms512m -Xmx512m
 #OTOBO_IMAGE_OTOBO_NGINX=rotheross/otobo-nginx-webproxy:devel-rel-10_1
 #OTOBO_IMAGE_OTOBO_NGINX=otobo-nginx-webproxy:local-10.1.x
 ```
-cd docker-compose/
-cp otobo-override-https.yml otobo-override-https.yml.ORIG
-sed -i -e 's|otobo_nginx_ssl:/etc/nginx/ssl|./otobo_nginx_ssl:/etc/nginx/ssl|g' otobo-override-https.yml
-mkdir otobo_nginx_ssl
-
-
-
-
-openssl req -newkey rsa:2048 -nodes -keyout otobo_nginx_ssl/ssl-key.key -x509 -days 365 -out otobo_nginx_ssl/ssl-cert.crt
-
-
-openssl req -newkey rsa:2048 -nodes -keyout otobo_nginx_ssl/default.key -x509 -days 365 -out otobo_nginx_ssl/default.crt
-
-default.key
-
-openssl req -trustout -x509 -newkey rsa:4096 -sha256 -nodes -keyout privkey.pem -out fullchain.pem -days 3650
-
-openssl req -trustout -x509 -newkey rsa:4096 -sha256 -nodes -keyout otobo_nginx_ssl/ssl-key.key -out otobo_nginx_ssl/ssl-cert.crt -days 365
-
-openssl x509 -in otobo_nginx_ssl/ssl-cert.crt -trustout -out otobo_nginx_ssl/normal.pem
-
-cd otobo_nginx_ssl
-mv ssl-cert.crt ssl-cert.crt.ORIG
-cp normal.pem ssl-cert.crt
-
-```
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-Country Name (2 letter code) [AU]:US
-State or Province Name (full name) [Some-State]:VA
-Locality Name (eg, city) []:Reston
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:SWC
-Organizational Unit Name (eg, section) []:SWC
-Common Name (e.g. server FQDN or YOUR name) []:tickets01.cas.local
-Email Address []:christopher.sargent@sargentwalker.io
-
-```
-
-
-vim docker-compose/otobo-override-https.yml
-*
-From 
-- otobo_nginx_ssl:/etc/nginx/ssl
-
-To
-
-#    - ./otobo_nginx_ssl:/etc/nginx/ssl
-      - ./otobo_nginx_ssl/ssl-cert.crt:/etc/nginx/ssl/ssl-cert.crt
-      - ./otobo_nginx_ssl/ssl-key.key:/etc/nginx/ssl/ssl-key.key
-
-#    - ./otobo_nginx_ssl:/etc/nginx/ssl
-      - ./otobo_nginx_ssl/ssl-cert.crt:/etc/nginx/ssl/ssl-cert.crt
-      - ./otobo_nginx_ssl/ssl-key.key:/etc/nginx/ssl/ssl-key.key
-
+8. cd docker-compose/
+9. cp otobo-override-https.yml otobo-override-https.yml.ORIG
+10. vim otobo-override-https.yml
 ```
 # Run the OTOBO web app via HTTPS on the port $OTOBO_WEB_HTTPS_PORT or port 443 per default.
 # HTTP on port 80 redirects to HTTPS on port 443.
@@ -294,8 +241,10 @@ services:
     restart: always
     volumes:
 #    - ./otobo_nginx_ssl:/etc/nginx/ssl
-      - ./otobo_nginx_ssl/ssl-cert.crt:/etc/nginx/ssl/ssl-cert.crt
-      - ./otobo_nginx_ssl/ssl-key.key:/etc/nginx/ssl/ssl-key.key
+#      - ./otobo_nginx_ssl/ssl-cert.crt:/etc/nginx/ssl/ssl-cert.crt
+#      - ./otobo_nginx_ssl/ssl-key.key:/etc/nginx/ssl/ssl-key.key
+      - ./otobo_nginx_ssl/default.crt:/etc/nginx/ssl/default.crt
+      - ./otobo_nginx_ssl/default.key:/etc/nginx/ssl/default.key
 
     # The HTTP port is exposed, but only redirects to HTTPS
     ports:
@@ -315,17 +264,51 @@ services:
 volumes:
   otobo_nginx_ssl:
     external: true
+```
+11. cd /root/otobo-docker
+12. docker compose up -d
+13. https://tickets01.cas.local/otobo/installer.pl
+
+# NOtes
+1. sed -i -e 's|otobo_nginx_ssl:/etc/nginx/ssl|./otobo_nginx_ssl:/etc/nginx/ssl|g' otobo-override-https.yml
+2. mkdir otobo_nginx_ssl
+3. openssl req -newkey rsa:2048 -nodes -keyout otobo_nginx_ssl/ssl-key.key -x509 -days 365 -out otobo_nginx_ssl/ssl-cert.crt
+4. openssl req -trustout -x509 -newkey rsa:4096 -sha256 -nodes -keyout privkey.pem -out fullchain.pem -days 3650
+5. openssl req -trustout -x509 -newkey rsa:4096 -sha256 -nodes -keyout otobo_nginx_ssl/ssl-key.key -out otobo_nginx_ssl/ssl-cert.crt -days 365
+6. openssl x509 -in otobo_nginx_ssl/ssl-cert.crt -trustout -out otobo_nginx_ssl/normal.pem
+7. cd otobo_nginx_ssl
+8. mv ssl-cert.crt ssl-cert.crt.ORIG
+9. cp normal.pem ssl-cert.crt
+
+```
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:VA
+Locality Name (eg, city) []:Reston
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:SWC
+Organizational Unit Name (eg, section) []:SWC
+Common Name (e.g. server FQDN or YOUR name) []:tickets01.cas.local
+Email Address []:christopher.sargent@sargentwalker.io
+
+```
+
 
 ```
 https://tickets01.cas.local/otobo/installer.pl
 database
 7l3mzVYlafKw3E4c
-
-
+```
+```
 Start page:
 https://tickets01.cas.local/otobo/index.pl
 User:
 root@localhost
 Password:
 qXjt3Aip4B88fuWC
-
+```
