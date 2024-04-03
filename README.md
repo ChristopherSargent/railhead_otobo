@@ -12,11 +12,11 @@ This repository contains the code and configuration instructions to deploy Rothe
 * Create cas.local domain 
 
 # Test VMs
+* Note VM is running Ubuntu 20.04
 * 172.18.0.22 tickets01.cas.local
 * 10.1.2.189 dell01.cas.local
 
 # Install Docker
-* Note VM is running Ubuntu 20.04
 1. ssh cas@172.18.0.22
 2. sudo -i 
 3. curl -fsSL https://get.docker.com -o install-docker.sh && sudo sh install-docker.sh
