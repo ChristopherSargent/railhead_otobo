@@ -1,4 +1,4 @@
-![alt text](rh_logo_small.jpg)
+![alt text](rh_small_logo.jpg)
 # Railhead Keycloak Project
 This repository contains the code and configuration instructions to deploy RotherOSS's otobo, a fork of OTRS CE containers deployed from podman. For additional details, please email at [christopher.sargent@sargentwalker.io](mailto:christopher.sargent@sargentwalker.io).
 
